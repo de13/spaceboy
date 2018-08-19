@@ -55,8 +55,8 @@ func funcReady(w http.ResponseWriter, r *http.Request) {
 func main() {
 	flag.Parse()
 	http.HandleFunc("/", handler)
-	http.HandleFunc("/healthz", funcHealthz)
-	http.HandleFunc("/ready", funcReady)
+	http.HandleFunc("/healthz/", funcHealthz)
+	http.HandleFunc("/ready/", funcReady)
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		panic(err)
