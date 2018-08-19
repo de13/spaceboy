@@ -16,4 +16,5 @@ You can overwrite default parameters:
 ## Examples
 
 `$ docker run de13/spaceboy:v2 -r 5 -h 30` # set Readiness to 5s and Health to 30s
+
 `$ docker run de13/spaceboy:v2 --ready 60` # set Readiness to 60s
