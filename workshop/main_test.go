@@ -9,6 +9,7 @@ import (
 )
 
 func TestHandle(t *testing.T) {
+	t.Parallel()
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handler)
 
@@ -28,6 +29,7 @@ func TestHandle(t *testing.T) {
 }
 
 func TestReady(t *testing.T) {
+	t.Parallel()
 	mux := http.NewServeMux()
 	mux.HandleFunc("/ready", funcReady)
 
@@ -37,8 +39,8 @@ func TestReady(t *testing.T) {
 	if writer.Code != 503 {
 		t.Errorf("Response code is %v, should be 503", writer.Code)
 	}
-	ready = 2
-	time.Sleep(2 * time.Second)
+	ready = 0
+	time.Sleep(1 * time.Second)
 	writer = httptest.NewRecorder()
 	request, _ = http.NewRequest("GET", "/ready", nil)
 	mux.ServeHTTP(writer, request)
@@ -48,6 +50,7 @@ func TestReady(t *testing.T) {
 }
 
 func TestHealthz(t *testing.T) {
+	t.Parallel()
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", funcHealthz)
 
@@ -57,8 +60,8 @@ func TestHealthz(t *testing.T) {
 	if writer.Code != 200 {
 		t.Errorf("Response code is %v, should be 200", writer.Code)
 	}
-	healthz = 2
-	time.Sleep(2 * time.Second)
+	healthz = 0
+	time.Sleep(1 * time.Second)
 	writer = httptest.NewRecorder()
 	request, _ = http.NewRequest("GET", "/healthz", nil)
 	mux.ServeHTTP(writer, request)
