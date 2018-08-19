@@ -1,5 +1,5 @@
 FROM golang:alpine AS builder
-ADD workshop/ src/goapp
+ADD goapp/ src/goapp
 WORKDIR src/goapp
 RUN go build -o goapp
 
