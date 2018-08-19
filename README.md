@@ -10,11 +10,11 @@ Spaceboy is a simple go web app for demoing K8s features by exposing the followi
 ## Options
 
 You can overwrite default parameters:
-* "--healthz|-h" int (in second): change the healthz delay (default is 120 seconds)
-* "--ready|-r" int (in second): change the readiness delay (default is 30 seconds)
+* "--healthz|-h" int (in seconds): change the healthz delay (default is 120 seconds)
+* "--ready|-r" int (in seconds): change the readiness delay (default is 30 seconds)
 
 ## Examples
 
-`$ docker run de13/spaceboy:v2 -r 5 -h 30` # set Readiness to 5s and Health to 30s
+`$ docker run -p 8080:8080 -d de13/spaceboy:v2 -r 5 -h 30` # set Readiness to 5s and Health to 30s
 
-`$ docker run de13/spaceboy:v2 --ready 60` # set Readiness to 60s
+`$ docker run -p 8080:8080 -d de13/spaceboy:v2 --ready 60` # set Readiness to 60s
