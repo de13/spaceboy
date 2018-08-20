@@ -18,3 +18,9 @@ You can overwrite default parameters:
 `$ docker run -p 8080:8080 -d de13/spaceboy:v2 -r 5 -h 30` # set Readiness to 5s and Health to 30s
 
 `$ docker run -p 8080:8080 -d de13/spaceboy:v2 --ready 60` # set Readiness to 60s
+
+## Futur work
+
+* "/memory/on|off": enable a memory leak simulation.
+* "/cpu/on|off": simulate a cpu intensive app.
+* rewrite app with 'path' package.
