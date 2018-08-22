@@ -20,6 +20,18 @@ func init() {
 	flag.IntVar(&ready, "r", 30, "Initial delay (in seconds) during which application is considered as not ready.")
 }
 
+func main() {
+	flag.Parse()
+	http.HandleFunc("/", handler)
+	http.HandleFunc("/healthz/", funcHealthz)
+	http.HandleFunc("/ready/", funcReady)
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		panic(err)
+	}
+
+}
+
 func uptime() time.Duration {
 	return time.Since(startTime)
 }
@@ -50,15 +62,4 @@ func funcReady(w http.ResponseWriter, r *http.Request) {
 	t, _ := template.ParseFiles("ready.html")
 	// Set the content of the web page to "Ready" after x seconds
 	t.Execute(w, uptime() > time.Second*time.Duration(ready))
-}
-
-func main() {
-	flag.Parse()
-	http.HandleFunc("/", handler)
-	http.HandleFunc("/healthz/", funcHealthz)
-	http.HandleFunc("/ready/", funcReady)
-	err := http.ListenAndServe(":8080", nil)
-	if err != nil {
-		panic(err)
-	}
 }
