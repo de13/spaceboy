@@ -21,6 +21,7 @@ You can overwrite default parameters:
 
 ## Futur work
 
-* "/memory/on|off": enable a memory leak simulation.
-* "/cpu/on|off": simulate a cpu intensive app.
-* rewrite app with 'path' package.
+* Enable a memory leak simulation.
+* Simulate a cpu intensive app.
+* Rewrite app with 'path' package.
+* Create Helm install
