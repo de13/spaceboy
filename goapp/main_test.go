@@ -11,8 +11,12 @@ import (
 
 func TestHandle(t *testing.T) {
 	t.Parallel()
+	pod, err := os.Hostname()
+	if err != nil {
+		panic(err)
+	}
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { fmt.Fprintln(w, "Hostname:") })
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { fmt.Fprintln(w, "Hostname:", pod) })
 
 	writer := httptest.NewRecorder()
 	request, _ := http.NewRequest("GET", "/", nil)
@@ -31,10 +35,9 @@ func TestHandle(t *testing.T) {
 
 func TestReady(t *testing.T) {
 	t.Parallel()
-	ready = 30
-	readiness := check{"ready.html", ready}
+	readiness := check{"ready.html", 1, http.StatusServiceUnavailable, http.StatusOK}
 	mux := http.NewServeMux()
-	mux.HandleFunc("/ready", ready.state)
+	mux.HandleFunc("/ready", readiness.state)
 
 	writer := httptest.NewRecorder()
 	request, _ := http.NewRequest("GET", "/ready", nil)
@@ -42,7 +45,6 @@ func TestReady(t *testing.T) {
 	if writer.Code != 503 {
 		t.Errorf("Response code is %v, should be 503", writer.Code)
 	}
-	ready = 0
 	time.Sleep(1 * time.Second)
 	writer = httptest.NewRecorder()
 	request, _ = http.NewRequest("GET", "/ready", nil)
@@ -54,10 +56,9 @@ func TestReady(t *testing.T) {
 
 func TestHealthz(t *testing.T) {
 	t.Parallel()
-	healthz = 30
-	healthiness := check{"strangerThings.html", healthz}
+	healthiness := check{"strangerThings.html", 1, http.StatusOK, http.StatusServiceUnavailable}
 	mux := http.NewServeMux()
-	mux.HandleFunc("/healthz", health.state)
+	mux.HandleFunc("/healthz", healthiness.state)
 
 	writer := httptest.NewRecorder()
 	request, _ := http.NewRequest("GET", "/healthz", nil)
@@ -65,7 +66,6 @@ func TestHealthz(t *testing.T) {
 	if writer.Code != 200 {
 		t.Errorf("Response code is %v, should be 200", writer.Code)
 	}
-	healthz = 0
 	time.Sleep(1 * time.Second)
 	writer = httptest.NewRecorder()
 	request, _ = http.NewRequest("GET", "/healthz", nil)
