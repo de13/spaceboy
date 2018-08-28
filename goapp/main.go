@@ -27,8 +27,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	readiness := check{"ready.html", ready}
-	healthiness := check{"strangerThings.html", healthz}
+	readiness := check{"ready.html", ready, http.StatusServiceUnavailable, http.StatusOK}
+	healthiness := check{"strangerThings.html", healthz, http.StatusOK, http.StatusServiceUnavailable}
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { fmt.Fprintln(w, "Hostname:", pod) })
 	http.HandleFunc("/healthz", healthiness.state)
 	http.HandleFunc("/ready", readiness.state)
@@ -44,14 +44,20 @@ func uptime() time.Duration {
 }
 
 func (c check) state(w http.ResponseWriter, r *http.Request) {
-	if uptime() > time.Second*time.Duration(healthz) {
-		w.WriteHeader(http.StatusServiceUnavailable)
-	}
 	t, _ := template.ParseFiles(filepath.Join("templates", c.template))
-	t.Execute(w, uptime() < time.Second*time.Duration(c.delay))
+	if uptime() < time.Second*time.Duration(c.delay) {
+		w.WriteHeader(c.initialStatus)
+		t.Execute(w, uptime() < time.Second*time.Duration(c.delay))
+	} else {
+		w.WriteHeader(c.definitiveStatus)
+		t.Execute(w, uptime() < time.Second*time.Duration(c.delay))
+	}
+
 }
 
 type check struct {
-	template string
-	delay    int
+	template         string
+	delay            int
+	initialStatus    int
+	definitiveStatus int
 }
