@@ -32,8 +32,7 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { fmt.Fprintln(w, "Hostname:", pod) })
 	http.HandleFunc("/healthz", healthiness.state)
 	http.HandleFunc("/ready", readiness.state)
-	err = http.ListenAndServe(":8080", nil)
-	if err != nil {
+	if err = http.ListenAndServe(":8080", nil); err != nil {
 		panic(err)
 	}
 
@@ -47,11 +46,10 @@ func (c check) state(w http.ResponseWriter, r *http.Request) {
 	t, _ := template.ParseFiles(filepath.Join("templates", c.template))
 	if uptime() < time.Second*time.Duration(c.delay) {
 		w.WriteHeader(c.initialStatus)
-		t.Execute(w, uptime() < time.Second*time.Duration(c.delay))
 	} else {
 		w.WriteHeader(c.definitiveStatus)
-		t.Execute(w, uptime() < time.Second*time.Duration(c.delay))
 	}
+	t.Execute(w, uptime() < time.Second*time.Duration(c.delay))
 
 }
 
