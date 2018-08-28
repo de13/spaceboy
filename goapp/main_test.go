@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -11,7 +12,7 @@ import (
 func TestHandle(t *testing.T) {
 	t.Parallel()
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", handler)
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { fmt.Fprintln(w, "Hostname:") })
 
 	writer := httptest.NewRecorder()
 	request, _ := http.NewRequest("GET", "/", nil)
@@ -30,8 +31,10 @@ func TestHandle(t *testing.T) {
 
 func TestReady(t *testing.T) {
 	t.Parallel()
+	ready = 30
+	readiness := check{"ready.html", ready}
 	mux := http.NewServeMux()
-	mux.HandleFunc("/ready", funcReady)
+	mux.HandleFunc("/ready", ready.state)
 
 	writer := httptest.NewRecorder()
 	request, _ := http.NewRequest("GET", "/ready", nil)
@@ -51,8 +54,10 @@ func TestReady(t *testing.T) {
 
 func TestHealthz(t *testing.T) {
 	t.Parallel()
+	healthz = 30
+	healthiness := check{"strangerThings.html", healthz}
 	mux := http.NewServeMux()
-	mux.HandleFunc("/healthz", funcHealthz)
+	mux.HandleFunc("/healthz", health.state)
 
 	writer := httptest.NewRecorder()
 	request, _ := http.NewRequest("GET", "/healthz", nil)
