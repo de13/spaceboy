@@ -37,7 +37,7 @@ func TestReady(t *testing.T) {
 	t.Parallel()
 	readiness := check{"ready.html", 1, http.StatusServiceUnavailable, http.StatusOK}
 	mux := http.NewServeMux()
-	mux.HandleFunc("/ready", readiness.state)
+	mux.HandleFunc("/ready", readiness.liveState)
 
 	writer := httptest.NewRecorder()
 	request, _ := http.NewRequest("GET", "/ready", nil)
@@ -58,7 +58,7 @@ func TestHealthz(t *testing.T) {
 	t.Parallel()
 	healthiness := check{"strangerThings.html", 1, http.StatusOK, http.StatusServiceUnavailable}
 	mux := http.NewServeMux()
-	mux.HandleFunc("/healthz", healthiness.state)
+	mux.HandleFunc("/healthz", healthiness.healthState)
 
 	writer := httptest.NewRecorder()
 	request, _ := http.NewRequest("GET", "/healthz", nil)

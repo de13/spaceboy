@@ -30,8 +30,8 @@ func main() {
 	readiness := check{"ready.html", ready, http.StatusServiceUnavailable, http.StatusOK}
 	healthiness := check{"strangerThings.html", healthz, http.StatusOK, http.StatusServiceUnavailable}
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { fmt.Fprintln(w, "Hostname:", pod) })
-	http.HandleFunc("/healthz", healthiness.state)
-	http.HandleFunc("/ready", readiness.state)
+	http.HandleFunc("/healthz", healthiness.healthState)
+	http.HandleFunc("/ready", readiness.liveState)
 	if err = http.ListenAndServe(":8080", nil); err != nil {
 		panic(err)
 	}
@@ -42,7 +42,7 @@ func uptime() time.Duration {
 	return time.Since(startTime)
 }
 
-func (c check) state(w http.ResponseWriter, r *http.Request) {
+func (c check) healthState(w http.ResponseWriter, r *http.Request) {
 	t, _ := template.ParseFiles(filepath.Join("templates", c.template))
 	if uptime() < time.Second*time.Duration(c.delay) {
 		w.WriteHeader(c.initialStatus)
@@ -50,7 +50,16 @@ func (c check) state(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(c.definitiveStatus)
 	}
 	t.Execute(w, uptime() < time.Second*time.Duration(c.delay))
+}
 
+func (c check) liveState(w http.ResponseWriter, r *http.Request) {
+	t, _ := template.ParseFiles(filepath.Join("templates", c.template))
+	if uptime() > time.Second*time.Duration(c.delay) {
+		w.WriteHeader(c.definitiveStatus)
+	} else {
+		w.WriteHeader(c.initialStatus)
+	}
+	t.Execute(w, uptime() > time.Second*time.Duration(c.delay))
 }
 
 type check struct {
