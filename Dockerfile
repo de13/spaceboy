@@ -1,6 +1,6 @@
 FROM golang:alpine AS builder
 ADD goapp/ src/goapp
-WORKDIR /go/src/goapp
+WORKDIR src/goapp
 RUN go build -o goapp
 
 FROM alpine
